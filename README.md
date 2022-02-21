@@ -1,0 +1,2 @@
+# GUI
+PyQt6 QUI
