@@ -27,6 +27,7 @@ import threading
 import time
 
 
+
 # Very useful tutorial on image conversion from OpenCV to PyQt
 # https://www.imagetracking.org.uk/2020/12/displaying-opencv-images-in-pyqt/
 
@@ -42,7 +43,7 @@ class UI(QMainWindow):
         self.ros_node = GUINode(parentGUI=self)
         self.ros_thread = threading.Thread(target=self.rosSpin)
         self.ros_thread.start()
-    
+
     def rosSpin(self):
         self.ros_node.get_logger().info('spinning up ros')
 

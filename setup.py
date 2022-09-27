@@ -1,6 +1,6 @@
 from setuptools import setup
 
-package_name = 'autonomy_onboard_interface'
+package_name = 'autonomy_hmi'
 ui_name = 'window.ui'
 
 setup(
@@ -26,8 +26,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'primary_interface = autonomy_onboard_interface.primary_interface:main',
-            'gui_node = autonomy_onboard_interface.gui_node:main'
+            'primary_interface = autonomy_hmi.primary_interface:main',
+            'gui_node = autonomy_hmi.gui_node:main'
         ],
     },
 )
