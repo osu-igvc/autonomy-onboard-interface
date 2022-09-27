@@ -2,6 +2,7 @@ from concurrent.futures import thread
 from symtable import Symbol
 import sys
 from tkinter import W
+from urllib.request import Request
 
 import matplotlib as plt
 from matplotlib.figure import Figure
@@ -26,6 +27,9 @@ import cv2
 import threading
 import time
 
+from rclpy.action import ActionClient
+from autonomy_interfaces.action import RequestEnableDisable
+
 
 
 # Very useful tutorial on image conversion from OpenCV to PyQt
@@ -39,6 +43,8 @@ class UI(QMainWindow):
         uic.loadUi("install/autonomy_hmi/share/ament_index/resource_index/packages/window.ui", self)
         self.show()
         self.dbwEnabled = dbwEnabled
+
+        self.enableStatus = False
 
         self.ros_node = GUINode(parentGUI=self)
         self.ros_thread = threading.Thread(target=self.rosSpin)
@@ -72,8 +78,12 @@ class UI(QMainWindow):
         print("Exit")
         
     @QtCore.pyqtSlot()
-    def on_pushButton_clicked(self):
-        self.dbwEnabled = ~self.dbwEnabled
+    def on_enable_btn_clicked(self):
+        self.enableStatus = ~self.enableStatus
+        result = self.ros_node.updateEnableStatus(bool(self.enableStatus))
+
+        self.indicator_gear_label.setText(str(result))
+
         #self.updateDbwEnabled()
 
         
@@ -99,6 +109,9 @@ class GUINode(Node):
         self.subscription = self.create_subscription(Image, '/cameras/front_lane_markings', self.imageCallback, 10)
         self.bridge = CvBridge()
 
+        self.enable_server_client = ActionClient(self, RequestEnableDisable, 'SystemEnable')
+
+
     def imageCallback(self, msg):
         self.get_logger().info('Received image')
         self.numCount += 1
@@ -114,7 +127,13 @@ class GUINode(Node):
             #self.parentGUI.newImage('image #' + str(self.numCount))
             self.parentGUI.setSwitchableImage(qt_img)
 
-        
+    
+    def updateEnableStatus(self, new_status):
+        enable_msg = RequestEnableDisable.Goal()
+        enable_msg.set_enabled = new_status
+
+        self.enable_server_client.wait_for_server()
+        return self.enable_server_client.send_goal_async(enable_msg)
     
  
 
