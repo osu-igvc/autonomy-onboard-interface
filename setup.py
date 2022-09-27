@@ -26,7 +26,6 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'primary_interface = autonomy_hmi.primary_interface:main',
             'gui_node = autonomy_hmi.gui_node:main'
         ],
     },

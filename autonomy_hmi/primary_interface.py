@@ -66,7 +66,7 @@ class ImageReceiver(Node):
 class UI(QMainWindow):
     def __init__(self, dbwEnabled):
         super(UI, self).__init__()
-        uic.loadUi("install/autonomy_onboard_interface/share/ament_index/resource_index/packages/window.ui", self)
+        uic.loadUi("install/autonomy_hmi/share/ament_index/resource_index/packages/window.ui", self)
         self.show()
         rclpy.init()
 
@@ -129,7 +129,7 @@ def main():
     app = QtWidgets.QApplication(sys.argv)
     window = UI(dbwEnabled=False)
 
-    with open('install/autonomy_onboard_interface/share/ament_index/resource_index/packages/style.qss', "r") as f:
+    with open('install/autonomy_hmi/share/ament_index/resource_index/packages/style.qss', "r") as f:
         _style = f.read()
         window.setStyleSheet(_style)
     
