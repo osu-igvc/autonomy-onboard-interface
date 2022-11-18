@@ -69,12 +69,21 @@ class UI(QMainWindow):
     
     # ============================= Switchable views =============================
     def setSwitchableImage(self, frame):
-        #scaled_frame = frame.scaled(self.switchable_display.width(), self.switchable_display.height(), Qt.AspectRatioMode.KeepAspectRatio)
-        #self.switchable_display.setPixmap(QPixmap.fromImage(scaled_frame))
+        scaled_frame = frame.scaled(self.dashDisplay.width(), self.dashDisplay.height(), Qt.AspectRatioMode.KeepAspectRatio)
+        self.dashDisplay.setPixmap(QPixmap.fromImage(scaled_frame))
         pass
 
 
     # ============================= MISC =============================
+
+    def updateHealth(self, new_health_status: bool):
+        if new_health_status:
+            self.enable_check_status.setText("HEALTHY")
+            self.enable_check_status.setStyleSheet('background-color: green')
+
+        else:
+            self.enable_check_status.setText("UNHEALTHY")
+            self.enable_check_status.setStyleSheet('background-color: red')
 
     @QtCore.pyqtSlot()
     def on_actionNew_triggered(self):
@@ -139,6 +148,7 @@ class GUINode(Node):
 
         if self.parentGUI is not None:
             self.parentGUI.enableBtn.healthStateUpdated(self._systemHealthStatus)
+            self.parentGUI.updateHealth(self._systemHealthStatus)
 
     def systemEnableCallback(self, msg):
         pass

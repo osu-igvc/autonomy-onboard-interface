@@ -26,7 +26,9 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'gui_node = autonomy_hmi.gui_node:main'
+            'gui_node = autonomy_hmi.gui_node:main',
+            'joy_pub_node = autonomy_hmi.joy_pub_node:main',
+            'joy_motion_mapper_node = autonomy_hmi.joy_motion_mapper_node:main'
         ],
     },
 )
