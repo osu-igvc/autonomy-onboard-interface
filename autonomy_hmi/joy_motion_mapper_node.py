@@ -1,11 +1,20 @@
-from xml.etree.ElementTree import PI
+# General
+from math import pi
+
+
+# ROS
 import rclpy
 from sensor_msgs.msg import Joy
 from geometry_msgs.msg import TwistStamped
+from std_msgs.msg import Bool
 from rclpy.node import Node
-import pygame
+from rclpy.action import ActionClient
+
+# PyGame - Joystick
 from pygame.locals import *
-from math import pi
+
+# Custom
+from autonomy_interfaces.action import RequestEnableDisable
 
 
 class JoystickSub(Node):
@@ -20,13 +29,17 @@ class JoystickSub(Node):
         # Publish new commands at 100Hz
         self.publishTimer = self.create_timer(1.0/100.0, self.publishCMDVel)
 
+        # Allow enabling
+        self.enable_status_sub = self.create_subscription(Bool, '/health/enable_status', self.systemEnableCallback, 1)
+        self.enable_server_client = ActionClient(self, RequestEnableDisable, 'SystemEnable')
+        self._systemEnableStatus = False
+        self.ENABLE_AUTONOMY_BUTTON = 2 # Triangle on PS4 Controller
 
-
-
+        # Mapping Constants
         self.VEL_LIN_MAX = 3
         self.VEL_LIN_MIN = -2
         self.VEL_LPF_ALPHA = 0.3
-        self.VEL_DEADZONE = 0.7
+        self.VEL_DEADZONE = 0.15
         self.vel_lin_prev = 0
 
 
@@ -48,6 +61,14 @@ class JoystickSub(Node):
         self.JOY_H_AXIS = 3
         self.JOY_H_DEADZONE = 0.15
 
+    def systemEnableCallback(self, msg:Bool):
+        self._systemEnableStatus = msg.data
+
+    def requestSystemEnableDisable(self):
+        enable_msg = RequestEnableDisable.Goal()
+        enable_msg.set_enabled = not self._systemEnableStatus
+        self.enable_server_client.send_goal_async(enable_msg)
+
     def publishCMDVel(self):
         self.cmd_vel_publisher.publish(self.cmd_vel)
 
@@ -59,9 +80,12 @@ class JoystickSub(Node):
         self.cmd_vel.header.frame_id = 'base_link'
 
 
-    def map_input_cb(self, msg):       # listens for published data then outputs it in arrays
+    def map_input_cb(self, msg: Joy):       # listens for published data then outputs it in arrays
         # The formatiing of this outputs a long string of arrays with some labels before them.
         #self.get_logger().info('Time: "%s"  Axis and buttons: "%s" , "%s"' % (msg.header.stamp, msg.axes, msg.buttons))
+
+        if msg.buttons[self.ENABLE_AUTONOMY_BUTTON]:
+            self.requestSystemEnableDisable()
 
         analogV_input = msg.axes[self.JOY_V_AXIS]
         analogH_input = msg.axes[self.JOY_H_AXIS]
