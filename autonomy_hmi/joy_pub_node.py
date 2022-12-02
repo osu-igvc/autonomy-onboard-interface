@@ -30,6 +30,7 @@ class JoystickPub(Node):
 
         # Reports buttons, must be int32 format:
         self.msg.buttons = [0]*(self.stick.get_numbuttons())  
+        self.rumbling = False
 
     def updateHeader(self):
          # Sending timestamp with each update 
@@ -44,9 +45,14 @@ class JoystickPub(Node):
                 self.msg.buttons[event.button] = 1
             elif event.type == pygame.JOYBUTTONUP:
                 self.msg.buttons[event.button] = 0
+
+                if event.button == 9: # options button
+                 self.stick.rumble(0.3, 1.0, 1000)
+
                     
             elif event.type == pygame.JOYAXISMOTION:
                 self.msg.axes[event.axis] = event.value
+
         self.updateHeader()    #Updates the header each time update runs and outputs 
         self.publisher.publish(self.msg)    # Publishes values each time update runs
 
