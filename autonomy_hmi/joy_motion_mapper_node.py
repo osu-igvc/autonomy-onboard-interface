@@ -76,8 +76,8 @@ class JoystickSub(Node):
         self.vel_lin_prev = 0
 
 
-        self.VEL_ANG_MAX = pi
-        self.VEL_ANG_MIN = -pi
+        self.VEL_ANG_MAX = pi/2
+        self.VEL_ANG_MIN = -pi/2
         self.VEL_ANG_LPF_ALPHA = 0.3
         self.VEL_ANG_DEADZONE = 0.1
         self.vel_ang_prev = 0
